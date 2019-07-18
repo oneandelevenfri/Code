@@ -1,0 +1,80 @@
+1*序列求和
+数据规模较大时，不可暴力求解，并且要用长整型
+
+2*圆的面积
+#include <iostream>
+#include <iomanip>
+
+#define pi 3.14159265358979323
+using namespace std;
+
+int main()
+{
+    int r;
+    cin>>r;
+    double s=pi*r*r;
+    cout<<fixed<<setprecision(7)<<s<<endl; //保留小数点的格式输出
+    return 0;
+}
+3*斐波那契余数
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+
+int main()
+{
+    int f1=1,f2=1,fn=1;
+    int n;
+    cin>>n;
+    for(int i=1;i<n-1;i++)
+    {
+        fn=(f1+f2)%10007;//可以直接算余数
+        f1=f2;
+        f2=fn;
+    }
+    cout<<fn;
+    return 0;
+}
+4*写出32位的2进制
+a.转二进制
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+int main()
+{
+    int arr[5]={0,0,0,0,0};
+    for(int i=0;i<32;i++)
+    {   int k=0,tmp=0;
+        for(int j=4;j>=0;j--)
+            cout<<arr[j];
+            cout<<endl;
+            tmp=1+arr[k];
+            if(tmp==1)
+            {
+                arr[k]=tmp;
+            }
+            else
+            {
+
+                do{
+                    arr[k]=0;
+                    arr[++k]+=1;
+                }while(arr[k]==2&&k<5);
+            }
+
+}
+    return 0;
+}
+
+b.暴力二进制
+#include <iostream>
+using namespace std;
+int main()
+{
+    for(int i=0;i<32;i++){
+        cout<<i%32/16<<i%16/8<<i%8/4<<i%4/2<<i%2<<endl;
+    }
+    return 0;
+}
