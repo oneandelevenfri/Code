@@ -1,3 +1,10 @@
+---------
+6* C++中的字符串
+char a[]，string a，都可以直接cin>>a;
+string a 中的a可以用string库函数，append(),length等均可
+也可以直接cout<<a;
+
+
 1*序列求和
 数据规模较大时，不可暴力求解，并且要用长整型
 
@@ -78,3 +85,34 @@ int main()
     }
     return 0;
 }
+
+5* 10-》16
+#include <iostream>
+
+using namespace std;
+int main()
+{ char arr[16]={'0','1','2','3','4','5','6','7','8',
+    '9','A','B','C','D','E','F'};
+    char brr[8]={};
+    int k=0;
+    long n;
+    cin>>n;
+    if(n==0)
+        cout<<n;
+    else
+    {
+       while(n>0)
+    {
+        brr[k++]=arr[n%16];
+        n/=16;
+    }
+    for(int i=k-1;i>=0;i--)
+    {
+        cout<<brr[i];
+    }
+    }
+
+   return 0;
+
+}
+
