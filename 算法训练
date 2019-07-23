@@ -1,0 +1,54 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+using namespace std;
+
+const int maxn = 101;
+const int mod = 1000000007;
+
+int f[maxn][maxn];              //f[i][j]表示i位数，最后一位是j的k好数的个数，其中f[i][j] = sum(f[i-1][j]);
+
+int main()
+{
+    int l, k;
+    while(cin >> k>> l)
+    {
+        if(l == 1)             //一位数的话就直接是k-1个了
+        {
+            cout << k-1 << endl;
+            continue;
+        }
+        memset(f,0,sizeof f);
+        for(int j = 0; j < k; j++)         //如果是一位数，那么每个小于k的数就是1
+        {
+            f[1][j] = 1;
+        }
+        for(int i = 2; i < l; i++)         //两位数以上的判断
+        {
+            for(int j = 0; j < k; j++)     //在放好i-1位数后放下一个，这个数和循环中的i-1位数的最后每一位都不能相邻
+            {
+                int cnt = 0;               //不断计算放一位数字
+                for(int r = 0; r < k; ++r)
+                {
+                    if(r == j + 1 ||r == j - 1)continue;  //判断要放的j是否是已放好的i-1位数的最后每一位r的邻位
+                    cnt = (cnt + f[i-1][r]) % mod;        //cnt的值即为其本身加上放好前i-1位且最后一位放的是r的个数，因为前i-1位数放好后继续放下一位，此时的下一位必须是循环的这一个
+                }
+                f[i][j] = cnt;
+            }
+        }
+        int sum = 0;
+        for(int j = 1; j < k; ++j)
+        {
+            int cnt = 0;
+            for(int r = 0; r < k; ++r)
+            {
+                if(r == j + 1 ||r == j - 1)continue;
+                cnt = (cnt + f[l-1][r]) % mod;
+            }
+            sum = (sum + cnt)%mod;
+        }
+        cout<< sum <<endl;
+    }
+    return 0;
+}
+
