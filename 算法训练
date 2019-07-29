@@ -133,3 +133,84 @@ int main(){
         }
     return 0;
     }
+###最短路
+#include<cstdio>
+#include<iostream>
+#include<cstring>
+#include<queue>
+#include<limits.h>
+using namespace std;
+const int MAXN = 20001;
+const int MAXL = 200001;
+const int INF = INT_MAX;
+int dist[MAXN];          //dist[x]表示从源点到x所需的最短距离，初始为INF
+int head[MAXN];
+int M;      //边的索引
+bool inQueue[MAXN];
+queue<int> Q;           //队列Q用来存放可松弛周围结点的结点
+struct Edge{
+        int value;
+        int to;
+        int pre;
+    }edge[MAXL];                   //采用链式前向星存储边集
+
+    //构建边集合
+void add(int from, int to, int value){
+        edge[M].to = to;
+        edge[M].pre = head[from];//这条边前一条输入的同样从1可直达的边
+        edge[M].value = value;
+        head[from] = M++;
+    }
+
+    //SPFA算法
+void SPFA(int start){
+        dist[start] = 0;             //源点到自己的距离为0
+        Q.push(start);
+        inQueue[start] = true;
+        while (!Q.empty()){
+            int temp = Q.front();//取队头元素
+            Q.pop();
+            for (int j = head[temp]; j != -1; j = edge[j].pre){
+                int toNode = edge[j].to;
+                if (dist[toNode] > dist[temp] + edge[j].value){        //本题保证无负环，否则需要利用一个数组判断j是否入队超过n次
+                    dist[toNode] = dist[temp] + edge[j].value;
+                   if (!inQueue[toNode]){
+                        Q.push(toNode);
+                        cout<<"push:"<<toNode<<endl;
+                        inQueue[toNode] = true;
+                    }
+                }
+            }
+            inQueue[temp] = false;
+        }
+    }
+
+int main(){
+    memset(head, -1, sizeof(head));
+    int n, m;
+    scanf("%d%d", &n, &m);
+    for (int i = 1; i <= n; i++){         //初始化
+            dist[i] = INF;
+            inQueue[i] = false;
+        }
+
+    for (int p = 1; p <= m; p++){
+            int from, to, value;
+            scanf("%d%d%d", &from, &to, &value);            //用cin速度好像要慢一倍= =
+            add(from, to, value);
+        }
+    cout<<"print out EDGE:"<<endl;
+    for(int i = 0; i<=M;i++)
+        {
+            cout<<i<<" ";
+            cout<<edge[i].to<<" ";
+            cout<<edge[i].pre<<" ";
+            cout<<edge[i].value<<"||";
+            cout<<head[i]<<endl;
+        }
+    SPFA(1);
+    for (int x = 2; x <= n; x++){
+            printf("%d\n", dist[x]);
+        }
+    return 0;
+    }
