@@ -1,0 +1,146 @@
+#include<stdio.h>
+#include<iostream>
+using namespace std;
+#define ForD(i,n) for(int i=n;i;i--)
+#define F (100000007)
+#define MAXN (2*200000+10)
+long long mul(long long a,long long b){return (a*b)%F;}
+long long add(long long a,long long b){return (a+b)%F;}
+long long sub(long long a,long long b){return (a-b+(a-b)/F*F+F)%F;}
+
+int n,root=0;/*n->叶子结点数,root->根序号？*/
+struct node
+{
+    int fa;        /*父结点的下标*/
+    int ch[2];     /*0->左树下标    1->右树下标*/
+    int size;      /*size->当前结点含有的有效结点数*/
+    int c;         /*当前结点的数值*/
+    node():size(0),c(0){ch[0]=ch[1]=fa=0;}    /*初始化为0*/
+}a[MAXN];                                    /*树形数组->纪录各叶结点的数值*/
+
+void update(int x)/*更新叶结点个数*/
+{
+    a[x].size=a[a[x].ch[0]].size+a[a[x].ch[1]].size+(a[x].c>0);
+}
+int tail=0;
+void pushdown(int x)/*将叶结点的父结点指向当前结点*/
+{
+    a[a[x].ch[0]].fa=a[a[x].ch[1]].fa=x;
+}
+
+/*创建树*/
+void build(int &x)
+{
+    if (!x) x=++tail;
+    scanf("%d",&a[x].c);
+    if (a[x].c==0)
+    {
+        build(a[x].ch[0]);/*创建左子树*/
+        build(a[x].ch[1]);/*创建右子树*/
+        update(x);pushdown(x);/*更新当前结点的有效叶结点个数，以及父结点指向*/
+    }else a[x].size=1;
+}
+
+void rotate(int x)/*旋转*/
+{
+    int y=a[x].fa,z=a[y].fa;
+    bool p=a[y].ch[0]==x;
+    if (z)        /*有爷爷*/
+    {
+        if (a[z].ch[0]==y) /*未旋转*/
+            a[z].ch[0]=x;  /*将子树提拔为父树(升序)*/
+        else
+            a[z].ch[1]=x;    /*还原状态*/
+    }
+    a[x].fa=z,a[y].fa=x;/*当前结点与父结点交换(父结点指向)*/
+    if (a[x].ch[p])     /*原子树是否有右树(隔代转移)*/
+        a[a[x].ch[p]].fa=y;
+    a[y].ch[p^1]=a[x].ch[p];
+    a[x].ch[p]=y;        /*父树移至子树的右端(右树)*/
+    update(y);    /*更新旋转后，子树的结点的有效结点数*/
+}
+
+void splay(int x)
+{
+    while (a[x].fa)/*不为根结点*/
+    {
+        int y=a[x].fa,z=a[y].fa;
+        if (z)        /*有爷爷*/
+            if ((a[y].ch[0]==x)^(a[z].ch[0]==y)) rotate(x);/*旋转*/
+            else rotate(y);
+        rotate(x);
+    }
+    update(x);
+}
+void ins(long long &tot,int x,int y)
+{
+    a[x].size++;            /*插入+1*/
+    if (a[y].c<=a[x].c)        /*是逆序对*/
+    {
+        if (a[x].ch[0])     /*左树有子*/
+            ins(tot,a[x].ch[0],y);
+        else                 /*左树无子*/
+            a[y].fa=x,splay(a[x].ch[0]=y);/*右数插入到左树子*/
+    }
+    else
+    {
+        tot+=a[a[x].ch[0]].size+(a[x].c>0);
+        if (a[x].ch[1]) ins(tot,a[x].ch[1],y);
+        else a[y].fa=x,splay(a[x].ch[1]=y);
+    }
+}
+
+
+int q[MAXN],size;
+
+void clac(int x,int y)
+{
+    if (a[y].ch[0]) clac(x,a[y].ch[0]);
+    if (a[y].c) q[++size]=y;
+    if (a[y].ch[1]) clac(x,a[y].ch[1]);
+}
+
+long long merge(bool &lor,int z)/*分治*/
+{
+    int z_lson=a[z].ch[0],z_rson=a[z].ch[1];
+    if (a[z_lson].size<a[z_rson].size) /*判断叶结点多的往前调(平衡树?)*/
+        swap(x,y);
+
+    a[z_lson].fa=0;
+    a[z_rson].fa=0;
+    q[1]=z_rson;
+    size=0;
+    clac(z_lson,z_rson);
+    long long tot=0;    /*最少逆序对*/
+    ForD(i,size)        /*循环（子结点数）次*/
+    {
+        int now=q[i];
+        a[now].ch[0]=a[now].ch[1]=a[now].fa=0;
+        a[now].size=1;
+        ins(tot,x,now);
+        x=now;
+    }
+    a[x].fa=z;
+    a[z].ch[0]=0,a[z].ch[1]=x;
+    return tot;
+}
+
+
+long long qur(int &x)
+{
+    if (a[x].c) return 0;/*若根结点没有叶结点，则逆序对为0*/
+    else
+    {
+        long long lson=a[a[x].ch[0]].size,rson=a[a[x].ch[1]].size,ls=qur(a[x].ch[0]),rs=qur(a[x].ch[1]);
+        bool lor=0;
+        long long ms=merge(lor,x);
+        return ls+rs+min(lson*rson-ms,ms);
+    }
+}
+int main()
+{
+    scanf("%d",&n);
+    build(root);
+    cout<<qur(root)<<endl;
+    return 0;
+}
