@@ -1,0 +1,146 @@
+基础，判断n皇后
+
+#include<iostream>
+#include<math.h>
+using namespace std;
+
+int a[100], n, count;
+bool check_2 (int a[ ],int k)
+{//多次被调用，只需一重循环
+ for(int i=1;i<=k-1;i++)
+ {
+     //diffreent xieline&&different shu line
+  if((fabs(a[i]-a[k])==k-i)||(a[i]==a[k]))
+   return false;
+ }
+ return true;
+}
+void backtrack(int k)
+{
+ if (k>n)//找到解
+ {
+  /*for(int i=1;i<=8;i++)
+  {
+   cout<<a[i];
+  }
+  cout<<endl;*/
+  count++;
+ }
+ else
+ {
+  //control column
+  for (int i = 1;i <=n; i++)
+  {
+   a[k] = i;
+   if (check_2(a,k) == 1)
+   {
+       backtrack(k+1);
+   }
+  }
+ }
+}
+
+int main()
+{
+ n=4,count=0;
+ backtrack(1);
+ cout<<count<<endl;
+}
+
+
+判断双n皇后
+蓝桥杯 基础训练
+#include<iostream>
+#include<math.h>
+using namespace std;
+
+int a[10],b[10],mat[10][10],n,count;
+int whiteN,blackN;
+void printmat()
+{
+    cout<<endl;
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=n;j++)
+          cout<<mat[i][j]<<" ";
+        cout<<endl;
+    }
+
+    return;
+}
+bool check(int a[],int k)
+{
+    for(int i=1; i<k; i++)
+    {
+        if(fabs(a[k]-a[i])==k-i||a[k]==a[i])
+            return false;
+    }
+    return true;
+}
+
+void backtrack1(int k)
+{   if(k==1)
+    printmat();
+    if(k>n)
+    {
+        count++;
+        cout<<endl<<"find!"<<count<<endl;
+        printmat();
+    }
+    else
+    {
+        for(int i=1; i<=n; i++)
+        {
+            b[k]=i;
+            if(mat[k][i]==1&&check(b,k))
+                {
+                    mat[k][i]=-1;
+                    backtrack1(k+1);
+                    mat[k][i]=1;
+                }
+        }
+    }
+}
+
+
+void backtrack(int k)
+{
+    if(k>n)
+    {
+        backtrack1(1);
+    }
+    else
+    {
+        for(int i=1; i<=n; i++)
+        {
+            a[k]=i;
+            if(mat[k][i]==1&&check(a,k))
+                {
+                    mat[k][i]=0;
+                    backtrack(k+1);
+                    mat[k][i]=1;
+                }
+        }
+    }
+}
+
+int main()
+{
+    cin>>n;
+    whiteN=n,blackN=n;
+    for(int i=1;i<=n;i++)
+        for(int j=1;j<=n;j++)
+            cin>>mat[i][j];
+
+    backtrack(1);
+    cout<<count<<endl;
+}
+/*
+6
+1 1 1 1 1 1
+1 1 1 1 1 1
+1 1 1 1 1 1
+1 1 1 1 1 1
+1 1 1 1 1 1
+1 1 1 1 1 1
+*/
